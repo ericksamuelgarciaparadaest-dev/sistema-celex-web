@@ -337,14 +337,13 @@ def api_m2_exportar_pases():
 @app.route("/api/m2/pases/stream")
 def api_m2_pases_stream():
     def event_stream():
-        ultimo_conteo = -1
+        ultimo_hash = ""
         while True:
-            actual = len(PASES_HOY)
-            if actual != ultimo_conteo:
-                data = json.dumps({"pases": PASES_HOY})
-                yield f"data: {data}\n\n"
-                ultimo_conteo = actual
-            time.sleep(1)
+            actual_str = json.dumps({"pases": PASES_HOY})
+            if actual_str != ultimo_hash:
+                yield f"data: {actual_str}\n\n"
+                ultimo_hash = actual_str
+            time.sleep(2)
 
     return Response(event_stream(), mimetype="text/event-stream")
 
@@ -453,14 +452,13 @@ def api_m3_credencial_solicitar():
 @app.route("/api/m3/credencial/stream")
 def api_m3_credencial_stream():
     def event_stream():
-        ultimo_conteo = -1
+        ultimo_hash = ""
         while True:
-            actual = len(CREDENCIALES_HOY)
-            if actual != ultimo_conteo:
-                data = json.dumps({"credenciales": CREDENCIALES_HOY})
-                yield f"data: {data}\n\n"
-                ultimo_conteo = actual
-            time.sleep(1)
+            actual_str = json.dumps({"credenciales": CREDENCIALES_HOY})
+            if actual_str != ultimo_hash:
+                yield f"data: {actual_str}\n\n"
+                ultimo_hash = actual_str
+            time.sleep(2)
 
     return Response(event_stream(), mimetype="text/event-stream")
 
@@ -647,7 +645,7 @@ def api_m4_prestamo_stream():
             if actual_str != ultimo_hash:
                 yield f"data: {actual_str}\n\n"
                 ultimo_hash = actual_str
-            time.sleep(1)
+            time.sleep(2)
 
     return Response(event_stream(), mimetype="text/event-stream")
 
@@ -862,7 +860,7 @@ def api_m5_stream():
             if actual_str != ultimo_hash:
                 yield f"data: {actual_str}\n\n"
                 ultimo_hash = actual_str
-            time.sleep(1)
+            time.sleep(2)
 
     return Response(event_stream(), mimetype="text/event-stream")
 

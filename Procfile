@@ -1,1 +1,1 @@
-﻿web: gunicorn app:app
+﻿web: gunicorn -k gevent --timeout 120 -w 2 app:app
