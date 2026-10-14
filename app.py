@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# OBLIGATORIO: monkey.patch_all() debe ir en la PRIMERA LÍNEA para que gevent no bloquee el servidor
+from gevent import monkey
+monkey.patch_all()
+
 import os, csv, io, json, time, re, psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, request, jsonify, Response, render_template
@@ -17,6 +21,13 @@ PASES_HOY = []
 CREDENCIALES_HOY = []
 PRESTAMOS_HOY = []
 CORBATINES_HOY = []
+
+HEADERS_SSE = {
+    "Cache-Control": "no-cache, no-transform",
+    "X-Accel-Buffering": "no",  # Desactiva buffering en Nginx/Render
+    "Connection": "keep-alive",
+    "Content-Type": "text/event-stream"
+}
 
 def get_db():
     return psycopg2.connect(DB_URI, cursor_factory=RealDictCursor, connect_timeout=5)
@@ -343,9 +354,9 @@ def api_m2_pases_stream():
             if actual_str != ultimo_hash:
                 yield f"data: {actual_str}\n\n"
                 ultimo_hash = actual_str
-            time.sleep(2)
+            time.sleep(1)
 
-    return Response(event_stream(), mimetype="text/event-stream")
+    return Response(event_stream(), headers=HEADERS_SSE)
 
 # ==========================================
 # MÓDULO 3: CREDENCIALIZACIÓN Y GENERACIÓN SVG
@@ -458,9 +469,9 @@ def api_m3_credencial_stream():
             if actual_str != ultimo_hash:
                 yield f"data: {actual_str}\n\n"
                 ultimo_hash = actual_str
-            time.sleep(2)
+            time.sleep(1)
 
-    return Response(event_stream(), mimetype="text/event-stream")
+    return Response(event_stream(), headers=HEADERS_SSE)
 
 @app.route("/api/m3/credencial/limpiar", methods=["POST"])
 def api_m3_credencial_limpiar():
@@ -645,9 +656,9 @@ def api_m4_prestamo_stream():
             if actual_str != ultimo_hash:
                 yield f"data: {actual_str}\n\n"
                 ultimo_hash = actual_str
-            time.sleep(2)
+            time.sleep(1)
 
-    return Response(event_stream(), mimetype="text/event-stream")
+    return Response(event_stream(), headers=HEADERS_SSE)
 
 # ==========================================
 # MÓDULO 5: CORBATINES DE ACCESO VEHICULAR
@@ -860,9 +871,9 @@ def api_m5_stream():
             if actual_str != ultimo_hash:
                 yield f"data: {actual_str}\n\n"
                 ultimo_hash = actual_str
-            time.sleep(2)
+            time.sleep(1)
 
-    return Response(event_stream(), mimetype="text/event-stream")
+    return Response(event_stream(), headers=HEADERS_SSE)
 
 @app.route("/api/m5/corbatin/svg")
 def api_m5_corbatin_svg():
